@@ -1,212 +1,89 @@
-/* 
-#include<stdio.h>
-#include<string.h>
-#include<pthread.h>
-#include<stdlib.h>
-#include<unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
 
-pthread_t tid[4];
 
-void* doSomeThing(void *arg)
-{
-    unsigned long i = 0;
-    pthread_t id = pthread_self();
+struct obj {
+	int num;
+	int wait;
+};
 
-    if(pthread_equal(id,tid[0]))
-    {
-        printf("\n First thread processing\n");
+//Prototype
+void *print_message_function(void *ptr);
+
+// Producer function
+void *producer(){
+  int producingItem = 1;
+  // Process loop
+  while(1){
+    // Waits 3-7s before trying to add to the stack
+    
+    // Produce item to add to the stack
+    
+    // Stack access loop
+    while(producingItem){
+    	// Try to block the stack
+      
+      // Check if stack is full
+      if(stackFull()){
+        // Unblock access to stack
+        
+        // Wait
+        
+      }else{
+        // Add item to stack
+        
     }
-    else
-    {
-        printf("\n Second thread processing\n");
-    }
-
-    for(i=0; i<(0xFFFFFFFF);i++);
-
-    return NULL;
+    
+  }
+		
+  
 }
+  
 
-int main(void)
-{
-    int i = 0;
-    int err;
 
-    while(i < 4)
-    {
-        err = pthread_create(&(tid[i]), NULL, &doSomeThing, NULL);
-        if (err != 0)
-            printf("\ncan't create thread :[%s]", strerror(err));
-        else
-            printf("\n Thread created successfully\n");
+// Consumer function
+void Consumer() {
+  //check if thread has anything
+  //Get sleep time value then sleep for wait time
+  
+}
+// Waits 2-9s before trying to remove from the stack
 
-        i++;
-    }
+int main() {
+    int iret1, iret2;
+    long t;
+		
+  	// Initialize stack of 32 elements
+  
+  	// Create mutex for stack
+  	pthread_mutex thread1, thread2;  
+  
+  	// Create/start producer thread
+  
+  	// Create/start consumer thread
+  
+  	// Wait until users exits the program
+  	// ctrl-c
+  
+iret1 = pthread_create(&thread1, NULL, print_message_function, (void*)t);
+    if(iret1) {
+        fprintf(stderr,"Error - pthread_create() return code: %d\n",iret1);
+        exit(EXIT_FAILURE);
+    }   
 
-    sleep(5);
+    iret1 = pthread_create(&thread2, NULL, print_message_function, (void*)t);
+    if(iret2) {
+        fprintf(stderr,"Error - pthread_create() return code: %d\n",iret1);
+        exit(EXIT_FAILURE);
+    }   
+
     return 0;
 }
-*/
-
-#include <stdio.h>
-#include <string.h>
 
 
-/* Period parameters */  
-#define N 624
-#define M 397
-#define MATRIX_A 0x9908b0dfUL   /* constant vector a */
-#define UPPER_MASK 0x80000000UL /* most significant w-r bits */
-#define LOWER_MASK 0x7fffffffUL /* least significant r bits */
-
-static unsigned long mt[N]; /* the array for the state vector  */
-static int mti=N+1; /* mti==N+1 means mt[N] is not initialized */
-
-/* initializes mt[N] with a seed */
-void init_genrand(unsigned long s)
-{
-	mt[0]= s & 0xffffffffUL;
-	for (mti=1; mti<N; mti++) {
-		mt[mti] = 
-			(1812433253UL * (mt[mti-1] ^ (mt[mti-1] >> 30)) + mti); 
-		/* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
-		/* In the previous versions, MSBs of the seed affect   */
-		/* only MSBs of the array mt[].                        */
-		/* 2002/01/09 modified by Makoto Matsumoto             */
-		mt[mti] &= 0xffffffffUL;
-		/* for >32 bit machines */
-	}
-}
-
-/* initialize by an array with array-length */
-/* init_key is the array for initializing keys */
-/* key_length is its length */
-/* slight change for C++, 2004/2/26 */
-void init_by_array(unsigned long init_key[], int key_length)
-{
-	int i, j, k;
-	init_genrand(19650218UL);
-	i=1; j=0;
-	k = (N>key_length ? N : key_length);
-	for (; k; k--) {
-		mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1664525UL))
-			+ init_key[j] + j; /* non linear */
-		mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
-		i++; j++;
-		if (i>=N) { mt[0] = mt[N-1]; i=1; }
-		if (j>=key_length) j=0;
-	}
-	for (k=N-1; k; k--) {
-		mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941UL))
-			- i; /* non linear */
-		mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
-		i++;
-		if (i>=N) { mt[0] = mt[N-1]; i=1; }
-	}
-
-	mt[0] = 0x80000000UL; /* MSB is 1; assuring non-zero initial array */ 
-}
-
-/* generates a random number on [0,0xffffffff]-interval */
-unsigned long genrand_int32(void)
-{
-	unsigned long y;
-	static unsigned long mag01[2]={0x0UL, MATRIX_A};
-	/* mag01[x] = x * MATRIX_A  for x=0,1 */
-
-	if (mti >= N) { /* generate N words at one time */
-		int kk;
-
-		if (mti == N+1)   /* if init_genrand() has not been called, */
-			init_genrand(5489UL); /* a default initial seed is used */
-
-		for (kk=0;kk<N-M;kk++) {
-			y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
-			mt[kk] = mt[kk+M] ^ (y >> 1) ^ mag01[y & 0x1UL];
-		}
-		for (;kk<N-1;kk++) {
-			y = (mt[kk]&UPPER_MASK)|(mt[kk+1]&LOWER_MASK);
-			mt[kk] = mt[kk+(M-N)] ^ (y >> 1) ^ mag01[y & 0x1UL];
-		}
-		y = (mt[N-1]&UPPER_MASK)|(mt[0]&LOWER_MASK);
-		mt[N-1] = mt[M-1] ^ (y >> 1) ^ mag01[y & 0x1UL];
-
-		mti = 0;
-	}
-  
-	y = mt[mti++];
-
-	/* Tempering */
-	y ^= (y >> 11);
-	y ^= (y << 7) & 0x9d2c5680UL;
-	y ^= (y << 15) & 0xefc60000UL;
-	y ^= (y >> 18);
-
-	return y;
-}
-
-/* generates a random number on [0,0x7fffffff]-interval */
-long genrand_int31(void)
-{
-	return (long)(genrand_int32()>>1);
-}
-
-/* generates a random number on [0,1]-real-interval */
-double genrand_real1(void)
-{
-	return genrand_int32()*(1.0/4294967295.0); 
-	/* divided by 2^32-1 */ 
-}
-
-/* generates a random number on [0,1)-real-interval */
-double genrand_real2(void)
-{
-	return genrand_int32()*(1.0/4294967296.0); 
-	/* divided by 2^32 */
-}
-
-/* generates a random number on (0,1)-real-interval */
-double genrand_real3(void)
-{
-	return (((double)genrand_int32()) + 0.5)*(1.0/4294967296.0); 
-	/* divided by 2^32 */
-}
-
-/* generates a random number on [0,1) with 53-bit resolution*/
-double genrand_res53(void) 
-{ 
-	unsigned long a=genrand_int32()>>5, b=genrand_int32()>>6; 
-	return(a*67108864.0+b)*(1.0/9007199254740992.0); 
-} 
-/* These real versions are due to Isaku Wada, 2002/01/09 added */
-
-
-int main(int argc, char **argv, unsigned long *target)
-{
-
-	unsigned int eax;
-	unsigned int ebx;
-	unsigned int ecx;
-	unsigned int edx;
-
-	char vendor[13];
-	
-	eax = 0x01;
-
-	__asm__ __volatile__(
-	                     "cpuid;"
-	                     : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
-	                     : "a"(eax)
-	                     );
-	
-	if(ecx & 0x40000000){
-		unsigned char rdnumber;
-		asm volatile ("RDRAND %0; setc %1" : "=pn" (*target), "=qm" (ok));
-		return (int) ok;
-	}
-	else{
-		*target = genrand_int32();
-		return 0;
-	}
-
-	return 0;
+void *print_message_function(void *threadid) {
+    long tid;
+    tid = (long)threadid;
+    printf("Hello World!\n", tid);
 }
